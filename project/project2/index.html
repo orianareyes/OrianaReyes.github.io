@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Oriana" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project2</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project2</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+<p>Introduction:
+For Project 2, I chose to focus on class grades from a Chemical Engineering course at McMaster University. This dataset includes 96 total observations and 7 variables. The variables include, Prefix (what year the student is in college), Assignment (student’s grade for assignment), Tutorial (student’s grade for tutorial assignment), Midterm (student’s grade for midterm exam), Take home (student’s grade for take home exam), Final(student’s grade for final exam), and Identification student’s classification where lower classmen: freshmen and sophomore and upperclassmen: juniors and seniors).</p>
+<p>Manova Testing:</p>
+<pre class="r"><code>library(readxl)
+classdata &lt;- read_xlsx(&quot;Project2.xlsx&quot;)
+head(classdata)</code></pre>
+<pre><code>## # A tibble: 6 x 7
+##   Prefix    Assignment Tutorial Midterm TakeHome Final Identification
+##   &lt;chr&gt;          &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;         
+## 1 Sophomore       57.1     34.1    64.4     51.5  52.5 Lower classmen
+## 2 Senior          95.0    105.     67.5     99.1  68.3 Upperclassmen 
+## 3 Senior          83.7     83.2    30       63.2  48.9 Upperclassmen 
+## 4 Junior          81.2     96.1    49.4    106.   80.6 Upperclassmen 
+## 5 Senior          91.3     93.6    95      107.   73.9 Upperclassmen 
+## 6 Junior          95       92.6    93.1     97.8  68.1 Upperclassmen</code></pre>
+<pre class="r"><code>man1&lt;-manova(cbind(Tutorial, Final)~Identification, data= classdata)
+summary(man1)</code></pre>
+<pre><code>##                Df  Pillai approx F num Df den Df    Pr(&gt;F)    
+## Identification  1 0.21593   12.668      2     92 1.382e-05 ***
+## Residuals      93                                             
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary.aov(man1)</code></pre>
+<pre><code>##  Response Tutorial :
+##                Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Identification  1   4546  4546.0   24.13 3.845e-06 ***
+## Residuals      93  17521   188.4                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response Final :
+##                Df Sum Sq Mean Sq F value  Pr(&gt;F)  
+## Identification  1   1413 1412.61  4.1035 0.04566 *
+## Residuals      93  32015  344.25                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+## ✓ tibble  3.1.1     ✓ dplyr   1.0.5
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.4.0     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>classdata%&gt;%group_by(Identification)%&gt;%summarize(mean(Tutorial),mean(Final))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   Identification `mean(Tutorial)` `mean(Final)`
+##   &lt;chr&gt;                     &lt;dbl&gt;         &lt;dbl&gt;
+## 1 Lower classmen             71.5          58.4
+## 2 Upperclassmen              92.3          70.0</code></pre>
+<pre class="r"><code>library(rstatix)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rstatix&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre class="r"><code>group1 &lt;- classdata$Identification
+DVs &lt;- classdata %&gt;% select (Tutorial, Final)
+sapply(split(DVs, group1), mshapiro_test)</code></pre>
+<pre><code>##           Lower classmen Upperclassmen
+## statistic 0.8749335      0.9325375    
+## p.value   0.07550577     0.0002999813</code></pre>
+<p>A total of 3 tests were done above. These tests include 1 MANOVA and 2 ANOVA’s. The t-tests were not done because the ANOVA tells me the two groups are different. However, if this wasn’t true, there’d be 1 MANOVA, 2 ANOVAS, and 2 * 10 = 20 unique t tests.
+First, I ran a one-way MANOVA test in order to determine the effect of the classification of a student and two dependent variables, Tutorial and Final grades. Ho: The means of all groups are equal for each response variable of score and distance. Ha: For at least one response variable, at least on group mean differs. The MANOVA test showed the Pillai trace = 0.21593, pseudo F = 12.668 and p= 1.382e-05. Next, followup ANOVA’s were done due to the p-value being significantly small. For tutorial, the statistics are as following: pseudo F= 24.13 and p = 3.845e-06 and for Final, the statistics are as following: pseudo F= 4.1035 and p= 0.04566.The p values in both ANOVA’s are less than alpha value of 0.05, therefore the null hypothesis can be rejected, meaning one variable differs from classification/identification.</p>
+<p>RANDOMISATION TEST</p>
+<pre class="r"><code>library(vegan)</code></pre>
+<pre><code>## Loading required package: permute</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## This is vegan 2.5-7</code></pre>
+<pre class="r"><code>library(ggplot2) 
+ggplot(classdata, aes(Final, fill = Identification)) + geom_histogram(bins = 6.5) + facet_wrap(~Identification, ncol=2) + theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>classdata %&gt;% group_by(Identification) %&gt;% summarize(means = mean(Tutorial)) %&gt;% summarize(mean_diff = diff(means))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_diff
+##       &lt;dbl&gt;
+## 1      20.8</code></pre>
+<pre class="r"><code>newclassdata &lt;- classdata %&gt;% group_by(Identification) %&gt;% summarize(m = mean(Final)) %&gt;% summarize(diff(m))
+
+rand_dist &lt;- vector()
+for (i in 1:5000){
+  new_data &lt;- data.frame(Final = sample(classdata$Final), Identification = classdata$Identification)
+  rand_dist[i] &lt;- mean(new_data[classdata$Identification == &#39;Lower classmen&#39;, ]$Final) - mean(new_data[new_data$Identification == &quot;Upperclassmen&quot;,]$Final)
+}</code></pre>
+<pre class="r"><code>{hist(rand_dist); abline(v = c (-20.8231, 20.8231), col=&quot;red&quot;)}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>mean(rand_dist&gt; 20.8231 | rand_dist &lt; -20.8231)</code></pre>
+<pre><code>## [1] 4e-04</code></pre>
+<p>First, 5,000 random permutations were made. The p-value for permutation test is 2e-04, which is less than the alpha value of 0.05, therefore the null hypothesis can be rejected and I can conclude that the results are significant. In addition the difference in means is 20.8231. The mean of upperclassmen grades is different than lowerclassmen grades.</p>
+<p>Linear Regression Model</p>
+<pre class="r"><code>classdata$Final_c &lt;- log(classdata$Final)
+classdata$Midterm_c &lt;- log(classdata$Midterm)
+
+fit1 &lt;- lm(Midterm_c ~ Identification* Final_c, data = classdata)
+
+summary(fit1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Midterm_c ~ Identification * Final_c, data = classdata)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.62065 -0.12970  0.03818  0.14176  0.53391 
+## 
+## Coefficients:
+##                                     Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)                          1.40706    1.14229   1.232   0.2212  
+## IdentificationUpperclassmen         -0.44548    1.19955  -0.371   0.7112  
+## Final_c                              0.67744    0.28237   2.399   0.0185 *
+## IdentificationUpperclassmen:Final_c  0.08902    0.29541   0.301   0.7638  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.2311 on 91 degrees of freedom
+## Multiple R-squared:  0.4803, Adjusted R-squared:  0.4632 
+## F-statistic: 28.04 on 3 and 91 DF,  p-value: 6.254e-13</code></pre>
+<pre class="r"><code>coef(fit1)</code></pre>
+<pre><code>##                         (Intercept)         IdentificationUpperclassmen 
+##                          1.40706247                         -0.44548313 
+##                             Final_c IdentificationUpperclassmen:Final_c 
+##                          0.67743899                          0.08902292</code></pre>
+<pre class="r"><code>fit&lt;- lm(Final~Identification, data=classdata)</code></pre>
+<pre class="r"><code>library(ggplot2)
+classdata %&gt;% ggplot(aes(Final_c, Midterm_c)) + geom_point() + geom_smooth(method = &#39;lm&#39; , se = F)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>cor(classdata$Final_c, classdata$Midterm_c)</code></pre>
+<pre><code>## [1] 0.6870842</code></pre>
+<pre class="r"><code>resids1 &lt;-fit1$residuals
+fitvals&lt;-fit1$fitted.values
+ggplot()+geom_point(aes(fitvals,resids1))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>ggplot() + geom_histogram(aes(resids1))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<pre class="r"><code>ggplot()+geom_qq(aes(sample=resids1))+geom_qq()</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-4.png" width="672" /></p>
+<pre class="r"><code>library(&quot;lmtest&quot;)</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre class="r"><code>library(sandwich)
+coeftest(fit1)[,1:2]</code></pre>
+<pre><code>##                                        Estimate Std. Error
+## (Intercept)                          1.40706247  1.1422905
+## IdentificationUpperclassmen         -0.44548313  1.1995514
+## Final_c                              0.67743899  0.2823702
+## IdentificationUpperclassmen:Final_c  0.08902292  0.2954106</code></pre>
+<pre class="r"><code>coeftest(fit1, vcov=vcovHC(fit1))[,1:2]</code></pre>
+<pre><code>##                                        Estimate Std. Error
+## (Intercept)                          1.40706247  0.9093302
+## IdentificationUpperclassmen         -0.44548313  0.9882791
+## Final_c                              0.67743899  0.2178999
+## IdentificationUpperclassmen:Final_c  0.08902292  0.2353833</code></pre>
+<p>As seen above by the first graph, the coefficient was positive, which indicates that students that scored higher on their midterm scored higher (y-axis) on their final assignment (x axis). Next, a ggplot was done in order to show the interactions between the two variables. As seen in the plot, homoskedasticity and linearity were not violated since no values flared out of the plot. Because of this, no further action is required.</p>
+<p>LINEAR REGRESSION MODEL (BOOTSTRAP)</p>
+<pre class="r"><code>samp_distn&lt;-replicate(5000, {
+boot_dat&lt;- classdata[sample(nrow(classdata),replace=TRUE),]
+y = ifelse(classdata$Identification == &#39;Upperclassmen&#39;, 1, 0)
+
+fit&lt;-lm(Midterm_c ~ Identification *Final_c, data=boot_dat)
+coef(fit)
+})
+
+library(&quot;tidyverse&quot;)
+samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept) IdentificationUpperclassmen   Final_c
+## 1    1.188012                    1.246508 0.2929966
+##   IdentificationUpperclassmen:Final_c
+## 1                                  NA</code></pre>
+<p>As seen above, the value for the intercept is 1.154937. Next, if there is a relationship between the identification of a student and their final assignment score, there would be a 0.2968052 increase, since the value is positive.</p>
+<p>LOGISITIC REGRESSION MODEL</p>
+<pre class="r"><code>library(tidyverse)
+library(lmtest)
+library(plotROC)
+
+y = ifelse(classdata$Identification == &#39;Upperclassmen&#39;, 1,0)
+
+
+fit2 &lt;- glm(y~ Assignment+Tutorial+Midterm+TakeHome+Final, data = classdata, family = binomial(link = &quot;logit&quot;))
+summary(fit2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ Assignment + Tutorial + Midterm + TakeHome + 
+##     Final, family = binomial(link = &quot;logit&quot;), data = classdata)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.6386   0.2187   0.3110   0.4578   1.2371  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept) -4.22053    2.54131  -1.661  0.09676 . 
+## Assignment  -0.01757    0.02879  -0.610  0.54178   
+## Tutorial     0.07380    0.02416   3.055  0.00225 **
+## Midterm     -0.02329    0.02484  -0.938  0.34849   
+## TakeHome     0.01213    0.01795   0.676  0.49908   
+## Final        0.03211    0.02747   1.169  0.24235   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 72.071  on 94  degrees of freedom
+## Residual deviance: 53.800  on 89  degrees of freedom
+## AIC: 65.8
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>exp(coef(fit2))</code></pre>
+<pre><code>## (Intercept)  Assignment    Tutorial     Midterm    TakeHome       Final 
+##   0.0146909   0.9825865   1.0765899   0.9769792   1.0122039   1.0326319</code></pre>
+<pre class="r"><code>prob &lt;- predict(fit2, data= classdata, type = &quot;response&quot;)
+library(dplyr)
+table(predict = as.numeric(prob &gt; 0.5,1,0), truth = y)</code></pre>
+<pre><code>##        truth
+## predict  0  1
+##       0  5  1
+##       1  7 82</code></pre>
+<pre class="r"><code>table(predict=prob, truth=y)%&gt;%addmargins()</code></pre>
+<pre><code>##                    truth
+## predict              0  1 Sum
+##   0.130375169130815  1  0   1
+##   0.135997204590535  1  0   1
+##   0.429545973443953  1  0   1
+##   0.443073474799546  1  0   1
+##   0.465248271547109  0  1   1
+##   0.48664328390552   1  0   1
+##   0.528721233719147  0  1   1
+##   0.559864364363721  1  0   1
+##   0.602066044829119  0  1   1
+##   0.624970526154206  0  1   1
+##   0.681371416324938  1  0   1
+##   0.727922344486754  0  1   1
+##   0.756249107787618  0  1   1
+##   0.765990965328503  0  1   1
+##   0.770585807609592  0  1   1
+##   0.839323898427689  0  1   1
+##   0.839764965842663  0  1   1
+##   0.840421279902154  0  1   1
+##   0.841440752178175  1  0   1
+##   0.841743934598847  0  1   1
+##   0.842252529096415  0  1   1
+##   0.842288955338408  0  1   1
+##   0.857176594729815  0  1   1
+##   0.866683368425657  0  1   1
+##   0.872193393477972  0  1   1
+##   0.880665919106499  0  1   1
+##   0.884019762521235  1  0   1
+##   0.889353411361813  0  1   1
+##   0.893228127967996  0  1   1
+##   0.894116285282609  0  1   1
+##   0.895262239603745  0  1   1
+##   0.898376425304917  0  1   1
+##   0.899826667455602  0  1   1
+##   0.90123031948878   0  1   1
+##   0.901779809899716  0  1   1
+##   0.90571709451902   0  1   1
+##   0.90588565216487   0  1   1
+##   0.912123578687039  0  1   1
+##   0.913157358329894  0  1   1
+##   0.913800936462436  0  1   1
+##   0.921153639286252  0  1   1
+##   0.927490328312819  0  1   1
+##   0.932137765438829  0  1   1
+##   0.934011576355553  0  1   1
+##   0.934834350028362  0  1   1
+##   0.940129763665563  0  1   1
+##   0.940345482747156  0  1   1
+##   0.942792618915354  0  1   1
+##   0.943627860219853  0  1   1
+##   0.94407853999127   0  1   1
+##   0.944436649840135  0  1   1
+##   0.945951534762166  0  1   1
+##   0.950087783099386  0  1   1
+##   0.951523898226683  0  1   1
+##   0.952261651211063  0  1   1
+##   0.952344423510391  0  1   1
+##   0.952792806917582  0  1   1
+##   0.954494579427043  0  1   1
+##   0.954700008429697  0  1   1
+##   0.958236615756513  0  1   1
+##   0.958746499509726  0  1   1
+##   0.961050850989774  0  1   1
+##   0.961113607869854  0  1   1
+##   0.962830761960182  0  1   1
+##   0.964132026056512  0  1   1
+##   0.964627642486589  0  1   1
+##   0.965207256826746  0  1   1
+##   0.965766932995787  0  1   1
+##   0.966529957336612  0  1   1
+##   0.966677667421876  1  0   1
+##   0.966899666653482  0  1   1
+##   0.968771978895557  0  1   1
+##   0.969115288990186  1  0   1
+##   0.969227653247707  1  0   1
+##   0.96930350858597   0  1   1
+##   0.969663848147403  0  1   1
+##   0.969899056488282  0  1   1
+##   0.970997680448641  0  1   1
+##   0.973892046956858  0  1   1
+##   0.974518440211259  0  1   1
+##   0.974885308373591  0  1   1
+##   0.975041618702929  0  1   1
+##   0.976305278654627  0  1   1
+##   0.976452335931589  0  1   1
+##   0.97760386804709   0  1   1
+##   0.978313991782503  0  1   1
+##   0.97832630864712   0  1   1
+##   0.978826265892697  0  1   1
+##   0.979890254503411  0  1   1
+##   0.982397745875053  0  1   1
+##   0.984685068501991  0  1   1
+##   0.984798147594306  0  1   1
+##   0.984975399308456  0  1   1
+##   0.985289960851636  0  1   1
+##   0.985345750917242  0  1   1
+##   Sum               12 83  95</code></pre>
+<pre class="r"><code>table(prediction = as.numeric(prob &gt; 0.5,1,0), truth = y)</code></pre>
+<pre><code>##           truth
+## prediction  0  1
+##          0  5  1
+##          1  7 82</code></pre>
+<p>The predictions were calculated and the results read: 5 true negatives, 1 false negatives, 7 false positives, and 82 true positives.</p>
+<p>ACCURACY:</p>
+<pre class="r"><code>(7+1)/95</code></pre>
+<pre><code>## [1] 0.08421053</code></pre>
+<p>The accuracy of the model is 8.4%</p>
+<p>SENSITIVITY: TPR</p>
+<pre class="r"><code>5/12</code></pre>
+<pre><code>## [1] 0.4166667</code></pre>
+<p>The probability of correctly determining the identification of the student to be an upperclassmen is 41.67%.</p>
+<p>SPECIFICITY (TNR)</p>
+<pre class="r"><code>1/83</code></pre>
+<pre><code>## [1] 0.01204819</code></pre>
+<p>The probability of correctly determining the identity of an LowerClassmen is 1.2%</p>
+<p>PRECISION (PPV)</p>
+<pre class="r"><code>1/6</code></pre>
+<pre><code>## [1] 0.1666667</code></pre>
+<p>The PPV Value that the grades are actually upperclassmens’ is 16.67%.</p>
+<pre class="r"><code>logit &lt;- coef(fit2) %&gt;% round(5) %&gt;% data.frame
+logit</code></pre>
+<pre><code>##                    .
+## (Intercept) -4.22053
+## Assignment  -0.01757
+## Tutorial     0.07380
+## Midterm     -0.02329
+## TakeHome     0.01213
+## Final        0.03211</code></pre>
+<pre class="r"><code>exp(coef(fit2))</code></pre>
+<pre><code>## (Intercept)  Assignment    Tutorial     Midterm    TakeHome       Final 
+##   0.0146909   0.9825865   1.0765899   0.9769792   1.0122039   1.0326319</code></pre>
+<pre class="r"><code>logisitic &lt;- function(x){exp(x)/ (1 + exp(x))}
+
+table(truth = y, prediction=classdata$Final&lt;2) %&gt;%addmargins()</code></pre>
+<pre><code>##      prediction
+## truth FALSE Sum
+##   0      12  12
+##   1      83  83
+##   Sum    95  95</code></pre>
+<pre class="r"><code>library(plotROC)
+classdata$logit &lt;- predict(fit2, type = &quot;link&quot;)
+classdata %&gt;% ggplot() + geom_density(aes(logit, color = Identification, fill = Identification), alpha = 0.4) + theme(legend.position = c(.3, .6)) + geom_vline(xintercept=2) + xlab (&quot;Predictor (Logit)&quot;) + geom_rug(aes(logit, color = Identification))</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+Here, I made an ROC curve. The area under the curve was calculated further for each variable.</p>
+<pre class="r"><code>library(plotROC)
+ROCplot &lt;- ggplot(classdata) + geom_roc(aes(d=y, m=Final), n.cuts = 0)
+ROCplot</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group      AUC
+## 1     1    -1 0.686245</code></pre>
+<p>The coefficient intercept estimate was calculated to be -4.22053. When there is an increase in Final grades, this value multiplies the odds by a factor of 0.0146909 Next, the accuracy was calculated to be 8.4%, tpr: 41.67%, TNR 1.2%, and PPV 16.67%. Then, a density plot was made in order to visualize better the accuracy, sensitivity, specificity and precision. Finally, an ROC plot curve was made and the AUC value was calculated using the ROC. The AUC value is 0.686245.</p>
+<pre class="r"><code>ROC2 &lt;- ggplot(classdata) + geom_roc(aes(d=y, m=Final), n.cuts=0) + geom_segment(aes(x=0, xend=1, y = 0, yend=1), lty=2)
+ROC2</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>calc_auc(ROC2)</code></pre>
+<pre><code>##   PANEL group      AUC
+## 1     1    -1 0.686245</code></pre>
+<p>LOGISITIC REGRESSION MODEL (PART2)</p>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+
+tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+
+if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+
+#CALCULATE EXACT AUC
+ord&lt;-order(probs, decreasing=TRUE)
+probs &lt;- probs[ord]; truth &lt;- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+
+n &lt;- length(TPR)
+auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,auc)
+}</code></pre>
+<p>LASSO REGRESSION</p>
+<pre class="r"><code>library(glmnet)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre><code>## Loaded glmnet 4.1-1</code></pre>
+<pre class="r"><code>classdata$binary &lt;- ifelse(classdata$Identification == &quot;Upperclassmen&quot;, 1,0)
+y &lt;- as.matrix(classdata$binary)
+x &lt;- model.matrix(binary ~ Assignment+Tutorial+Midterm+TakeHome+Final, data=classdata)[, -1]
+head(x)</code></pre>
+<pre><code>##   Assignment Tutorial Midterm TakeHome Final
+## 1      57.14    34.09   64.38    51.48 52.50
+## 2      95.05   105.49   67.50    99.07 68.33
+## 3      83.70    83.17   30.00    63.15 48.89
+## 4      81.22    96.06   49.38   105.93 80.56
+## 5      91.32    93.64   95.00   107.41 73.89
+## 6      95.00    92.58   93.12    97.78 68.06</code></pre>
+<pre class="r"><code>x&lt;- scale(x)
+head(x)</code></pre>
+<pre><code>##   Assignment   Tutorial     Midterm   TakeHome       Final
+## 1 -2.3058783 -3.6269453 -0.21236997 -1.2765479 -0.85078639
+## 2  0.7287286  1.0330961 -0.05283009  0.7534400 -0.01134255
+## 3 -0.1798123 -0.4236564 -1.97037674 -0.7787551 -1.04221988
+## 4 -0.3783305  0.4176312 -0.97938863  1.0460586  0.63719807
+## 5  0.4301509  0.2596858  1.35337078  1.1091891  0.28349685
+## 6  0.7247263  0.1905032  1.25723778  0.6984141 -0.02566029</code></pre>
+<pre class="r"><code>cv &lt;- cv.glmnet(x, y, family = &quot;binomial&quot;)
+lasso &lt;- glmnet(x, y, family = &quot;binomial&quot;, lambda = cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 6 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                   s0
+## (Intercept) 1.933934
+## Assignment  0.000000
+## Tutorial    .       
+## Midterm     .       
+## TakeHome    .       
+## Final       .</code></pre>
+<p>The variable that are retained is Tutorial.</p>
+<p>10 Fold CV</p>
+<pre class="r"><code>set.seed(1234)
+k=3
+data &lt;- classdata %&gt;% sample_frac 
+folds &lt;- ntile(1:nrow(data),n=k) 
+diags&lt;-NULL
+for(i in 1:k){
+train &lt;- data[folds!=i,] 
+test &lt;- data[folds==i,] 
+truth &lt;- test$binary
+fit &lt;- glm(binary ~ Assignment+Tutorial+Midterm+TakeHome+Final, data= train, family=&quot;binomial&quot;)
+probs &lt;- predict(fit, newdata=test, type=&quot;response&quot;)
+diags &lt;-rbind(diags, class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##         acc      sens      spec       ppv       auc
+## 1 0.8837366 0.9761905 0.2222222 0.8998016 0.6159921</code></pre>
+<p>When the 10 fold CV was performed, the accuracy of the fit model was calculated to be 0.88373, sensitivity was 0.9761, specificity was 0.222, and precision was 0.857. The AUC was calculated to be 0.61599, which was similar to the AUC from the previous calculations. Then, LASSO was done on the binary variable together with the variables that were retained from the 20-fold CV. The AUC was not the exact same value. There was a decrease of AUC values, from 0.686245 to 0.6159921. ThankYou!!</p>
+</div>
+<div id="including-plots" class="section level2">
+<h2>Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="../../project/project2_files/figure-html/pressure-1.png" width="672" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

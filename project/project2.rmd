@@ -1,0 +1,329 @@
+---
+title: "Project2"
+author: "Oriana Reyes"
+date: "4/28/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+class_diag <- function(probs,truth){ 
+  #CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV 
+  if(is.character(truth)==TRUE) truth<-as.factor(truth) 
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1 
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),factor(truth, levels=c(0,1))) 
+  acc=sum(diag(tab))/sum(tab) 
+  sens=tab[2,2]/colSums(tab)[2] 
+  spec=tab[1,1]/colSums(tab)[1] 
+  ppv=tab[2,2]/rowSums(tab)[2] 
+  
+#CALCULATE EXACT AUC 
+  ord<-order(probs, decreasing=TRUE) 
+  probs <- probs[ord]; truth <- truth[ord] 
+  TPR=cumsum(truth)/max(1,sum(truth))  
+  FPR=cumsum(!truth)/max(1,sum(!truth)) 
+  dup <-c(probs[-1]>=probs[-length(probs)], FALSE) 
+  TPR <-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1) 
+  n <- length(TPR) 
+  auc <- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n])) 
+  data.frame(acc,sens,spec,ppv,auc) 
+}
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+Introduction: 
+For Project 2, I chose to focus on class grades from a Chemical Engineering course at McMaster University. This dataset includes 96 total observations and 7 variables. The variables include, Prefix (what year the student is in college), Assignment (student's grade for assignment), Tutorial (student's grade for tutorial assignment), Midterm (student's grade for midterm exam), Take home (student's grade for take home exam), Final(student's grade for final exam), and Identification student's classification where lower classmen: freshmen and sophomore and upperclassmen: juniors and seniors).
+
+
+Manova Testing:
+```{r cars}
+library(readxl)
+classdata <- read_xlsx("Project2.xlsx")
+head(classdata)
+
+man1<-manova(cbind(Tutorial, Final)~Identification, data= classdata)
+summary(man1)
+
+summary.aov(man1)
+library(tidyverse)
+classdata%>%group_by(Identification)%>%summarize(mean(Tutorial),mean(Final))
+
+library(rstatix)
+group1 <- classdata$Identification
+DVs <- classdata %>% select (Tutorial, Final)
+sapply(split(DVs, group1), mshapiro_test)
+```
+A total of 3 tests were done above. These tests include 1 MANOVA and 2 ANOVA's. The t-tests were not done because the ANOVA tells me the two groups are different. However, if this wasn't true, there'd be 1 MANOVA, 2 ANOVAS, and 2 * 10 = 20 unique t tests.
+First, I ran a one-way MANOVA test in order to determine the effect of the classification of a student and two dependent variables, Tutorial and Final grades. Ho: The means of all groups are equal for each response variable of score and distance. Ha: For at least one response variable, at least on group mean differs. The MANOVA test showed the Pillai trace = 0.21593, pseudo F = 12.668  and p= 1.382e-05. Next, followup ANOVA's were done due to the p-value being significantly small. For tutorial, the statistics are as following: pseudo F= 24.13 and p = 3.845e-06 and for Final, the statistics are as following: pseudo F= 4.1035 and p= 0.04566.The p values in both ANOVA's are less than alpha value of 0.05, therefore the null hypothesis can be rejected, meaning one variable differs from classification/identification.
+
+
+
+RANDOMISATION TEST
+```{r}
+library(vegan)
+library(ggplot2) 
+ggplot(classdata, aes(Final, fill = Identification)) + geom_histogram(bins = 6.5) + facet_wrap(~Identification, ncol=2) + theme(legend.position = "none")
+
+classdata %>% group_by(Identification) %>% summarize(means = mean(Tutorial)) %>% summarize(mean_diff = diff(means))
+
+
+newclassdata <- classdata %>% group_by(Identification) %>% summarize(m = mean(Final)) %>% summarize(diff(m))
+
+rand_dist <- vector()
+for (i in 1:5000){
+  new_data <- data.frame(Final = sample(classdata$Final), Identification = classdata$Identification)
+  rand_dist[i] <- mean(new_data[classdata$Identification == 'Lower classmen', ]$Final) - mean(new_data[new_data$Identification == "Upperclassmen",]$Final)
+}
+```
+
+```{r}
+{hist(rand_dist); abline(v = c (-20.8231, 20.8231), col="red")}
+``` 
+
+```{r}
+mean(rand_dist> 20.8231 | rand_dist < -20.8231)
+```
+First, 5,000 random permutations were made. The p-value for permutation test is 2e-04, which is less than the alpha value of 0.05, therefore the null hypothesis can be rejected and I can conclude that the results are significant. In addition the difference in means is 20.8231. The mean of upperclassmen grades is different than lowerclassmen grades. 
+
+
+
+Linear Regression Model
+```{r}
+classdata$Final_c <- log(classdata$Final)
+classdata$Midterm_c <- log(classdata$Midterm)
+
+fit1 <- lm(Midterm_c ~ Identification* Final_c, data = classdata)
+
+summary(fit1)
+coef(fit1)
+
+fit<- lm(Final~Identification, data=classdata)
+
+```
+
+
+```{r}
+library(ggplot2)
+classdata %>% ggplot(aes(Final_c, Midterm_c)) + geom_point() + geom_smooth(method = 'lm' , se = F)
+cor(classdata$Final_c, classdata$Midterm_c)
+
+
+resids1 <-fit1$residuals
+fitvals<-fit1$fitted.values
+ggplot()+geom_point(aes(fitvals,resids1))+geom_hline(yintercept=0, color='red')
+
+ggplot() + geom_histogram(aes(resids1))
+
+ggplot()+geom_qq(aes(sample=resids1))+geom_qq()
+
+
+library("lmtest")
+library(sandwich)
+coeftest(fit1)[,1:2]
+coeftest(fit1, vcov=vcovHC(fit1))[,1:2]
+
+```
+As seen above by the first graph, the coefficient was positive, which indicates that students that scored higher on their midterm scored higher (y-axis) on their final assignment (x axis). Next, a ggplot was done in order to show the interactions between the two variables. As seen in the plot, homoskedasticity and linearity were not violated since no values flared out of the plot. Because of this, no further action is required. 
+
+LINEAR REGRESSION MODEL (BOOTSTRAP) 
+```{r}
+samp_distn<-replicate(5000, {
+boot_dat<- classdata[sample(nrow(classdata),replace=TRUE),]
+y = ifelse(classdata$Identification == 'Upperclassmen', 1, 0)
+
+fit<-lm(Midterm_c ~ Identification *Final_c, data=boot_dat)
+coef(fit)
+})
+
+library("tidyverse")
+samp_distn%>%t%>%as.data.frame%>%summarize_all(sd)
+
+```
+As seen above, the value for the intercept is 1.154937. Next, if there is a relationship between the identification of a student and their final assignment score, there would be a 0.2968052 increase, since the value is positive. 
+
+
+LOGISITIC REGRESSION MODEL
+```{r}
+library(tidyverse)
+library(lmtest)
+library(plotROC)
+
+y = ifelse(classdata$Identification == 'Upperclassmen', 1,0)
+
+
+fit2 <- glm(y~ Assignment+Tutorial+Midterm+TakeHome+Final, data = classdata, family = binomial(link = "logit"))
+summary(fit2)
+exp(coef(fit2))
+
+prob <- predict(fit2, data= classdata, type = "response")
+library(dplyr)
+table(predict = as.numeric(prob > 0.5,1,0), truth = y)
+table(predict=prob, truth=y)%>%addmargins()
+```
+
+```{r}
+table(prediction = as.numeric(prob > 0.5,1,0), truth = y)
+```
+The predictions were calculated and the results read: 5 true negatives, 1 false negatives, 7 false positives, and 82 true positives.
+
+ACCURACY:
+```{r}
+(7+1)/95
+```
+The accuracy of the model is 8.4%
+
+SENSITIVITY: TPR
+```{r}
+5/12
+```
+The probability of correctly determining the identification of the student to be an upperclassmen is 41.67%.
+
+SPECIFICITY (TNR)
+```{r}
+1/83
+```
+The probability of correctly determining the identity of an LowerClassmen is 1.2%
+
+
+PRECISION (PPV)
+```{r}
+1/6
+```
+The PPV Value that the grades are actually upperclassmens' is 16.67%.  
+
+```{r}
+logit <- coef(fit2) %>% round(5) %>% data.frame
+logit
+
+exp(coef(fit2))
+```
+
+
+```{r}
+
+logisitic <- function(x){exp(x)/ (1 + exp(x))}
+
+table(truth = y, prediction=classdata$Final<2) %>%addmargins()
+
+```
+
+
+```{r}
+library(plotROC)
+classdata$logit <- predict(fit2, type = "link")
+classdata %>% ggplot() + geom_density(aes(logit, color = Identification, fill = Identification), alpha = 0.4) + theme(legend.position = c(.3, .6)) + geom_vline(xintercept=2) + xlab ("Predictor (Logit)") + geom_rug(aes(logit, color = Identification))
+
+
+```
+Here, I made an ROC curve. The area under the curve was calculated further for each variable.
+
+```{r}
+library(plotROC)
+ROCplot <- ggplot(classdata) + geom_roc(aes(d=y, m=Final), n.cuts = 0)
+ROCplot
+calc_auc(ROCplot)
+
+```
+The coefficient intercept estimate was calculated to be -4.22053. When there is an increase in Final grades, this value multiplies the odds by a factor of 0.0146909  Next, the accuracy was calculated to be 8.4%, tpr: 41.67%, TNR 1.2%, and PPV 16.67%. Then, a density plot was made in order to visualize better the accuracy, sensitivity, specificity and precision. Finally, an ROC plot curve was made and the AUC value was calculated using the ROC. The AUC value is 0.686245.
+
+```{r}
+ROC2 <- ggplot(classdata) + geom_roc(aes(d=y, m=Final), n.cuts=0) + geom_segment(aes(x=0, xend=1, y = 0, yend=1), lty=2)
+ROC2
+calc_auc(ROC2)
+```
+
+
+
+LOGISITIC REGRESSION MODEL (PART2)
+
+```{r}
+
+class_diag<-function(probs,truth){
+
+tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+
+if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+
+#CALCULATE EXACT AUC
+ord<-order(probs, decreasing=TRUE)
+probs <- probs[ord]; truth <- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+
+n <- length(TPR)
+auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,auc)
+}
+
+
+```
+
+
+LASSO REGRESSION
+```{r}
+library(glmnet)
+classdata$binary <- ifelse(classdata$Identification == "Upperclassmen", 1,0)
+y <- as.matrix(classdata$binary)
+x <- model.matrix(binary ~ Assignment+Tutorial+Midterm+TakeHome+Final, data=classdata)[, -1]
+head(x)
+```
+
+```{r}
+x<- scale(x)
+head(x)
+```
+
+```{r}
+cv <- cv.glmnet(x, y, family = "binomial")
+lasso <- glmnet(x, y, family = "binomial", lambda = cv$lambda.1se)
+coef(lasso)
+```
+The variable that are retained is Tutorial. 
+
+
+10 Fold CV
+```{r}
+set.seed(1234)
+k=3
+data <- classdata %>% sample_frac 
+folds <- ntile(1:nrow(data),n=k) 
+diags<-NULL
+for(i in 1:k){
+train <- data[folds!=i,] 
+test <- data[folds==i,] 
+truth <- test$binary
+fit <- glm(binary ~ Assignment+Tutorial+Midterm+TakeHome+Final, data= train, family="binomial")
+probs <- predict(fit, newdata=test, type="response")
+diags <-rbind(diags, class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+``` 
+When the 10 fold CV was performed, the  accuracy of the fit model was calculated to be 0.88373, sensitivity was 0.9761, specificity was 0.222, and precision was 0.857. The AUC was calculated to be 0.61599, which was similar to the AUC from the previous calculations. Then, LASSO was done on the binary variable together with the variables that were retained from the 20-fold CV. The AUC was not the exact same value. There was a decrease of AUC values, from 0.686245 to 0.6159921. ThankYou!!
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -1,0 +1,15 @@
+---
+title: My First Blog!
+author: ''
+date: '2021-05-09'
+slug: my-first-blog
+categories: []
+tags: []
+description: ''
+---
+
+Hello world! Here's my first blog. I am typing this while I'm on the road to the Rio Grande Valley. I have been working on project 2 while I was packing and getting ready to move out of my apartment. Now, I am working on this Project 3 while I take advantage on this 7 hour road trip. 
+
+
+
+
